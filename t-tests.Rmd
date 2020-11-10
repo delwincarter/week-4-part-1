@@ -5,6 +5,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
 ```
 
 ## 1. confidence intervals
@@ -36,7 +38,59 @@ t.test(x = desert_bighorns, y = sierra_bighorns)
 ```
 
 
+## Part 2: Two-Sample t-test
+
+```{r}
+
+compact_suv <- mpg %>% 
+  filter(class %in% c("compact","suv"))
+```
+
+### exploratory data viz
+
+Histograms (exploratory)
+
+```{r}
+ggplot(data = compact_suv, aes(x = cty, )) +
+  geom_histogram(bins = 15)  +
+  facet_wrap(~class)
 
 
+```
+### quantile-quantile plot
+
+```{r}
+ggplot (data = compact_suv, aes(sample = cty)) +
+  geom_qq() +
+  facet_wrap(~class)
+```
+### descriptives
+
+```{r}
+
+car_stats <- compact_suv %>% 
+  group_by(class) %>% 
+  summarize(mean_city = mean(cty),
+          sd_city = sd(cty),
+          n = n())
+car_stats
+```
 
 
+### two sample t-test
+
+create vectors containing obsrevations 
+```{r}
+compact_sample <- compact_suv %>% 
+  filter(class == "compact") %>% 
+  pull(cty)
+
+suv_sample <- compact_suv %>% 
+  filter(class == "suv") %>% 
+  pull(cty)
+
+
+t.test (x = compact_sample, suv_sample)
+
+
+```
